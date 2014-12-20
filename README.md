@@ -8,6 +8,11 @@ jQuery Select2 plugin adapted to AngularJS way
 bower install --save ng-select2
 ```
 
+## Configuration
+```js
+angular.module('myApp', ['angular-select2']);
+```
+
 ## Typeahead
 ```js
 function UserController ($scope, User) {
