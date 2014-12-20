@@ -25,7 +25,7 @@ function UserController ($scope, User) {
 ```
 
 ## Default select (Example 1)
-```
+```html
 <select st-select2 ng-options="country.id as country.name for country in countries" ng-model="query.country"></select>
 ```
 
