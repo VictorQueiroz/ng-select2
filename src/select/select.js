@@ -13,11 +13,12 @@ function $Select2Provider () {
 
 	this.$get = function ($rootScope) {
 		function $Select2Factory (element, options, ngModel) {
-			this.$ngModel = ngModel;
-			var $element = this.$element = element;
+			var $select2 = {};
+			$select2.$ngModel = ngModel;
+			var $element = $select2.$element = element;
 			var tagName = $element[0].tagName;
-			var $options = this.$options = angular.extend({}, defaults, options);
-			var $scope = this.$scope = this.$options.scope;
+			var $options = $select2.$options = angular.extend({}, defaults, options);
+			var $scope = $select2.$scope = $select2.$options.scope;
 
 			if($options.tags && tagName === 'SELECT') {
 				throw new Error('You can use the \'tags\' option in a select input.');
@@ -27,29 +28,25 @@ function $Select2Provider () {
 				throw new Error('We cannot find the select2 key at $.fn(...)');
 			}
 
+			$select2.$render = function (value) {
+				$scope.$apply(function () {
+					ngModel.$setViewValue(value);
+					ngModel.$render();
+				});
+			};
+
+			$select2.$onChange = function (event) {
+				$select2.$render(event.val);
+			};
+
 			$element.select2($options);
 
-			$element.on('change', this.$onChange);
+			$element.on('change', $select2.$onChange);
 
 			return $element;
 		}
 
-		$Select2Factory.prototype = function () {};
-		$Select2Factory.prototype.$render = function (value) {
-			var ctrl = this;
-
-			this.$scope.$apply(function () {
-				ctrl.$ngModel.$setViewValue(value);
-				ctrl.$ngModel.$render();
-			});
-		};
-		$Select2Factory.prototype.$onChange = function (event) {
-			this.$render(event.val);
-		};
-
-		return function () {
-			return $Select2Factory.apply($Select2Factory.prototype, arguments);
-		};
+		return $Select2Factory;
 	};
 }
 
