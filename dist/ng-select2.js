@@ -1,3 +1,182 @@
-"use strict";angular.module("angular-select2",["angular-select2.select","angular-select2.typeahead"]);
-"use strict";function $Select2Provider(){var e={};Object.keys($.fn.select2.defaults).forEach(function(t){"id"!==t&&(e[t]=$.fn.select2.defaults[t])}),this.$get=["$rootScope",function(){function t(t,n,r){var c={};c.$ngModel=r;var i=c.$element=t,o=i[0].tagName,a=c.$options=angular.extend({},e,n),l=c.$scope=c.$options.scope;if(a.tags&&"SELECT"===o)throw new Error("You can use the 'tags' option in a select input.");if(!i.select2)throw new Error("We cannot find the select2 key at $.fn(...)");return c.$render=function(e){l.$apply(function(){r.$setViewValue(e),r.$render()})},c.$onChange=function(e){c.$render(e.val)},i.select2(a),i.on("change",c.$onChange),i}return t}]}function STSelect2Directive(e){return{require:"?ngModel",restrict:"A",link:function(t,n,r,c){if(c){var i=$.fn.select2.defaults;i.tags=[];var o={scope:t};Object.keys(i).forEach(function(e){angular.isUndefined(r[e])||(o[e]=t.$eval(r[e]))});{e(n,o,c)}}}}}STSelect2Directive.$inject=["$select2","$parse"],angular.module("angular-select2.select",[]).directive("stSelect2",STSelect2Directive).provider("$select2",$Select2Provider);
-"use strict";function STTypeaheadDirective(e,r){return{require:"?ngModel",link:function(s,t,n,i){if(i){if(!n.ngOptions)throw new Error("To use this directive, you must have the ngOptions directive.");var a={scope:s,query:function(e){function t(r){u.results=r.map(function(e){var r,t,n={};return n[l]=e,r=c(s,n),t=h(s,n),{text:r,id:t}}),e.callback(u)}var a,o,u={results:[]};if(!(a=n.ngOptions.match(NG_OPTIONS_REGEXP)))throw new Error("Error while trying to pass the ngOptions expression.");e.term!==i.$viewValue&&(i.$setViewValue(e.term),i.$render());{var c=r(a[2]||a[1]),l=a[4]||a[6],d=/ as /.test(a[0])&&a[1],h=(d?r(d):null,a[5],r(a[3]||""),r(a[2]?a[1]:l)),p=r(a[7]),v=a[8];v?r(a[8]):null}if(o=p(s,i),!o)throw new Error("Should return an array or promise but is undefined");o.then&&o.then(t),o instanceof Array&&t(o)}},o=e(t,a,i);t.data("$select2Service",o),n.$observe("disabled",function(e){o.select2("enable",!e)})}}}}var NG_OPTIONS_REGEXP=/^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;STTypeaheadDirective.$inject=["$select2","$parse"],angular.module("angular-select2.typeahead",[]).directive("stTypeahead",STTypeaheadDirective);
+'use strict';
+
+angular.module('angular-select2', [
+	'angular-select2.select',
+	'angular-select2.typeahead'
+]);
+'use strict';
+
+function $Select2Provider () {
+	var defaults = {};
+
+	Object.keys($.fn.select2.defaults).forEach(function (key) {
+		if(key === 'id') {
+			return;
+		}
+
+		defaults[key] = $.fn.select2.defaults[key];
+	});
+
+	this.$get = function ($rootScope) {
+		function $Select2Factory (element, options, ngModel) {
+			this.$ngModel = ngModel;
+			var $element = this.$element = element;
+			var tagName = $element[0].tagName;
+			var $options = this.$options = angular.extend({}, defaults, options);
+			var $scope = this.$scope = this.$options.scope;
+
+			if($options.tags && tagName === 'SELECT') {
+				throw new Error('You can use the \'tags\' option in a select input.');
+			}
+
+			if(!$element.select2) {
+				throw new Error('We cannot find the select2 key at $.fn(...)');
+			}
+
+			$element.select2($options);
+
+			$element.on('change', this.$onChange);
+			
+			this.$onChange = function (event) {
+  		  console.log(this)
+  			this.$render(event.val);
+  		};
+  		
+  		this.$render = function (value) {
+  			var ctrl = this;
+  
+  			this.$scope.$apply(function () {
+  				ctrl.$ngModel.$setViewValue(value);
+  				ctrl.$ngModel.$render();
+  			});
+  		};
+
+			return $element;
+		}
+
+		return function () {
+			return $Select2Factory.apply($Select2Factory.prototype, arguments);
+		};
+	};
+}
+
+function STSelect2Directive($select2, $parse) {
+	return {
+		require: '?ngModel',
+		restrict: 'A',
+		link: function (scope, element, attrs, ngModel) {
+			if(!ngModel) {
+				return;
+			}
+
+			var defaults = $.fn.select2.defaults;
+
+			defaults.tags = [];
+
+			var options = {
+				scope: scope
+			};
+
+			Object.keys(defaults).forEach(function (key) {
+				if(!(angular.isUndefined(attrs[key]))) {
+					options[key] = scope.$eval(attrs[key]);
+				}
+			});
+
+			var select2 = $select2(element, options, ngModel);
+		}
+	};
+}
+STSelect2Directive.$inject = ["$select2", "$parse"];
+
+angular.module('angular-select2.select', [])
+	.directive('stSelect2', STSelect2Directive)
+	.provider('$select2', $Select2Provider);
+'use strict';
+
+var NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
+
+function STTypeaheadDirective ($select2, $parse) {
+	return {
+		require: '?ngModel',
+		link: function (scope, element, attrs, ngModel) {
+			if(!ngModel) {
+				return;
+			}
+
+			if(!attrs.ngOptions) {
+				throw new Error('To use this directive, you must have the ngOptions directive.');
+			}
+
+			var options = {
+				scope: scope,
+				query: function (query) {
+					var data = { results: [] }, match, promise;
+
+					if (!(match = attrs.ngOptions.match(NG_OPTIONS_REGEXP))) {
+					  throw new Error('Error while trying to pass the ngOptions expression.');
+					}
+
+					if(query.term !== ngModel.$viewValue) {
+						ngModel.$setViewValue(query.term);
+						ngModel.$render();
+					}
+
+					var displayFn = $parse(match[2] || match[1]),
+					valueName = match[4] || match[6],
+					selectAs = / as /.test(match[0]) && match[1],
+					selectAsFn = selectAs ? $parse(selectAs) : null,
+					keyName = match[5],
+					groupByFn = $parse(match[3] || ''),
+					valueFn = $parse(match[2] ? match[1] : valueName),
+					valuesFn = $parse(match[7]),
+					track = match[8],
+					trackFn = track ? $parse(match[8]) : null;
+
+					function iterateResults (values) {
+						data.results = values.map(function (value, index) {
+							var locals = {}, text, id;
+
+							locals[valueName] = value;
+							text = displayFn(scope, locals);
+							id = valueFn(scope, locals);
+
+							return {
+								text: text,
+								id: id
+							};
+						});
+
+						query.callback(data);
+					}
+
+					promise = valuesFn(scope, ngModel);
+
+					if(!promise) {
+						throw new Error('Should return an array or promise but is undefined');
+					}
+
+					if(promise.then) {
+						promise.then(iterateResults);
+					}
+
+					if(promise instanceof Array) {
+						iterateResults(promise);
+					}
+				}
+			};
+
+			var select2 = $select2(element, options, ngModel);
+
+			element.data('$select2Service', select2);
+			
+			attrs.$observe('disabled', function (disabled) {
+				select2.select2('enable', !disabled);
+			});
+		}
+	};
+}
+STTypeaheadDirective.$inject = ["$select2", "$parse"];
+
+angular.module('angular-select2.typeahead', [])
+	.directive('stTypeahead', STTypeaheadDirective);

@@ -36,7 +36,7 @@ gulp.task('jshint', function () {
 gulp.task('scripts', ['jshint'], function () {
 	gulp.src(paths.scripts)
 		.pipe(ngAnnotate())
-		.pipe(uglify())
+		// .pipe(uglify())
 		.pipe(concat('ng-select2.js'))
 		.pipe(gulp.dest('dist'));
 });
