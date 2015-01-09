@@ -77,7 +77,7 @@ function STTypeaheadDirective ($select2, $parse) {
 			element.data('$select2Service', select2);
 			
 			attrs.$observe('disabled', function (disabled) {
-				select2.select2('enable', !disabled);
+				select2.$element.select2('enable', !disabled);
 			});
 		}
 	};

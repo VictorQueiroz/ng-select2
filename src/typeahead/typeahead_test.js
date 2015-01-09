@@ -1,7 +1,7 @@
 'use strict';
 
 describe('typeahead', function () {
-	var scope, $rootScope, $compile, typeahead, select2, form;
+	var scope, $rootScope, $compile, typeahead, select2, container, form, input;
 
 	beforeEach(module('angular-select2.typeahead'));
 
@@ -17,11 +17,17 @@ describe('typeahead', function () {
 			term: ''
 		};
 
+		var results = [];
+
+		for(var i=0;i<10;i++) {
+			results.unshift({
+				id: i,
+				name: 'item_' + i
+			})
+		}
+
 		scope.getResults = function (viewValue) {
-			return [{
-				id: 1,
-				name: 'Something'
-			}]
+			return results;
 		};
 
 		form = angular.element('<form>');
@@ -35,10 +41,16 @@ describe('typeahead', function () {
 		form.append(typeahead);
 
 		$compile(form)(scope);
+
+		$rootScope.$digest();
+
+		container = angular.element(form[0].querySelector('.select2-container'))
+		input = angular.element(container[0].querySelector('input'));
 	}));
 
-	it('should ', function () {
-		
-		console.log(angular.element(form[0].querySelector('.select2-container')).data('select2'))
-	})
+	it('should render the typeahead', function () {
+		expect(container.length).toBe(1);
+		container.select2('open');
+		input.val('5');
+	});
 });

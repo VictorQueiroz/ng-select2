@@ -13,6 +13,7 @@ function $Select2Provider () {
 
 	this.$get = function ($rootScope) {
 		function $Select2Factory (element, options, ngModel) {
+			var $select2 = {};
 			this.$ngModel = ngModel;
 			var $element = this.$element = element;
 			var tagName = $element[0].tagName;
@@ -29,9 +30,9 @@ function $Select2Provider () {
 
 			$element.select2($options);
 
-			$element.on('change', this.$onChange);
+			$element.on('change', $select2.$onChange);
 			
-  		this.$render = function (value) {
+  		$select2.$render = function (value) {
   			var ctrl = this;
   
   			this.$scope.$apply(function () {
@@ -40,11 +41,13 @@ function $Select2Provider () {
   			});
   		};
 			
-			this.$onChange = function (event) {
-  			this.$render(event.val);
+			$select2.$onChange = function (event) {
+  			$select2.$render(event.val);
   		};
 
-			return $element;
+  		angular.extend($select2, this);
+
+			return $select2;
 		}
 
 		return function () {
