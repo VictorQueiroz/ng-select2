@@ -83,5 +83,7 @@ function STTypeaheadDirective ($select2, $parse) {
 	};
 }
 
-angular.module('angular-select2.typeahead', [])
+angular.module('angular-select2.typeahead', [
+	'angular-select2.select'
+])
 	.directive('stTypeahead', STTypeaheadDirective);

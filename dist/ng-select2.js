@@ -37,11 +37,6 @@ function $Select2Provider () {
 
 			$element.on('change', this.$onChange);
 			
-			this.$onChange = function (event) {
-  		  console.log(this)
-  			this.$render(event.val);
-  		};
-  		
   		this.$render = function (value) {
   			var ctrl = this;
   
@@ -49,6 +44,10 @@ function $Select2Provider () {
   				ctrl.$ngModel.$setViewValue(value);
   				ctrl.$ngModel.$render();
   			});
+  		};
+			
+			this.$onChange = function (event) {
+  			this.$render(event.val);
   		};
 
 			return $element;
@@ -178,5 +177,7 @@ function STTypeaheadDirective ($select2, $parse) {
 }
 STTypeaheadDirective.$inject = ["$select2", "$parse"];
 
-angular.module('angular-select2.typeahead', [])
+angular.module('angular-select2.typeahead', [
+	'angular-select2.select'
+])
 	.directive('stTypeahead', STTypeaheadDirective);
